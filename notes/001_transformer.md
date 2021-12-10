@@ -49,3 +49,10 @@
 
 - multi-head：一次attention操作是把q, k, v投影到低维，multi-head是指同样的attention操作做h次，将所有的attention输出concat起来，然后再投影回来得到最终输出；
 - 为什么做multi-head：基于dot-product的attention中其实是没有可学习参数的，但是我们希望可以学习到不一样的模式，希望有一些不一样的计算相似度的方法；每一次attention计算都是一次投影的计算，我们记为w，我们希望w是可学的，新的度量空间可以匹配不同模式；multi-head做法就是给你h次机会，你将这h次的结果融合，可以学到不一样的投影方法，类似于CNN中的channle；
+
+**11.FFP是什么**
+
+视频58min
+
+**12.self-attention与rnn, cnn复杂度的对比**
+![image](https://user-images.githubusercontent.com/22740819/145567402-7799b78f-756b-452b-9dd0-30527c237bd2.png)
