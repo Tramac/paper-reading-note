@@ -38,10 +38,19 @@ BERT是如何突破以上局限性的？
 > 我理解以上两种方式分别想针对token-level与sentence-level任务
 
 ## Part4. 结论
+- BERT将之前基于单向结构的预训练模型拓展到双向结构，使得同样的一个预训练模型能够处理不同的NLP任务
+- BERT是ELMo使用双向信息（但基于比较旧的RNN架构）与GPT使用新架构transformer（但只能处理单项信息）两者的结合
 
 ## Part5. 相关工作
+- Unsupervised Feature-based Approaches: 代表作ELMo
+- Unsupervised Fine-tuning Approaches: 代表作GPT
+- Transfer Learning from Supervised Data: 在有标注的数据上，针对下游任务进行迁移学习
 
 ## Part6. BERT模型
+BERT中的两个步骤：pre-training和fine-tuning
+
+- 首先是在无标注数据上进行训练得到预训练模型，然后使用标注数据进行微调；微调时同样使用一个bert模型，其权重是用预训练好的模型参数作初始化的，所有参数在微调时都会参与训练；
+- 每一个下游任务都会有一个自己特定的bert模型（由预训练模型进行参数初始化），然后根据自己任务的标注数据进行fine-tuning
 
 ## Part7. 实验
 
