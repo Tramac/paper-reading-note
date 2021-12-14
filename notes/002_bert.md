@@ -49,8 +49,10 @@ BERT是如何突破以上局限性的？
 ## Part6. BERT模型
 BERT中的两个步骤：pre-training和fine-tuning
 
-- 首先是在无标注数据上进行训练得到预训练模型，然后使用标注数据进行微调；微调时同样使用一个bert模型，其权重是用预训练好的模型参数作初始化的，所有参数在微调时都会参与训练；
-- 每一个下游任务都会有一个自己特定的bert模型（由预训练模型进行参数初始化），然后根据自己任务的标注数据进行fine-tuning
+<img src="https://user-images.githubusercontent.com/22740819/145942921-7ed8cde2-d193-45bd-b169-dfed380de035.png" width=600>
+
+- 首先pre-training阶段使用无标注数据进行训练得到预训练模型，然后fine-tuning阶段使用标注数据对模型进行微调
+- fine-tuning时每一个下游任务都会有一个自己特定的bert模型，由预训练好的模型进行参数初始化（输出层除外），然后在自己任务的标注数据上进行微调，期间所有参数都会参与训练
 
 ## Part7. 实验
 
