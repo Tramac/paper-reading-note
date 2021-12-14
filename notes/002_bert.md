@@ -21,7 +21,21 @@ BERT与GPT和ELMo的区别：
 - ELMo: 基于RNN架构，BERT是基于transformer；ELMo在用到一些下游任务上时通常需要对架构做一些调整，而BERT只需要改最上层即可
 
 ## Part3. 导言
-sentence-level tasks & token-level tasks
+NLP任务可分为两类: sentence-level tasks & token-level tasks
+- sentence-level tasks: 句子层面的任务，主要用来建模句子之间的关系，比如句子情绪识别、两个句子之间的关系等
+- token-level tasks: 词元层面的任务，比如实体命名识别（NER）等
+
+在使用预训练模型做特征表示时，一般用两类策略：
+- feature-based:对每一个下游任务，构造一个与该任务相关的神经网络（比如RNN结构），而预训练好的表示（可理解为预训练模型的输出）作为额外的特征和已有输入一起送给模型，代表作ELMo
+- fine-tuning:在预训练模型用于下游任务时，只需要针对任务修改头部结构即可，模型预训练好的参数会在下游任务的数据上再进行微调一下（即所有的权重都会进行微调，对比feature-based来看由于输入的是特征相当于预训练模型的参数是固定的），代表作GPT
+
+当前预训练模型技术的局限性：
+- 标准的语言模型是一个单向的任务，导致选架构时有一些局限性，比如GPT使用的是一个从左到右的架构；但一些任务无论从左到右或者从右到左结构应该是一样的，比如句子情绪识别
+
+BERT是如何突破以上局限性的？
+- “masked language model”(MLM)：带掩码的语言模型，对句子随机掩盖部分词汇，然后预测这些词（完形填空），允许同时看左右的信息（与从左到右不同）
+- “next sentence prediction”: 给定两个句子，判断这两个句子在原文中是否相邻，希望可以学习到句子层面的一些信息
+> 我理解以上两种方式分别想针对token-level与sentence-level任务
 
 ## Part4. 结论
 
