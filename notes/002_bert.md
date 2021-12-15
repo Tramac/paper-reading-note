@@ -71,10 +71,10 @@ BERT模型里的可学习参数主要来自两部分：嵌入层与Transformer B
 
 <img src="https://user-images.githubusercontent.com/22740819/145948712-57dd1b13-596a-464f-a216-c2a39fb12ad6.png" width=400>
 
-*嵌入层*：实际是一个矩阵，输入为字典的大小30k，输出为隐层单元的个数H；
+***嵌入层***：实际是一个矩阵，输入为字典的大小30k，输出为隐层单元的个数H；
 > 参数量=30k（字典大小）* H（hidden size）
 
-*Transformer块*：包括multi head self-attention与MLP两部分中的参数，self-attention本身不包含参数，但是multi head self-attention中会把所有进入的Q、K、V分别做一次投影，每次投影的维度为64（`A * 64=H`）；MLP包含两个全连接层（第一个全连接层输入是`H`，输出是`4 * H`，参数量`H^2 * 4`；第二个全连接层输入是`4 * H`，输出是`H`，参数量`H^2 * 4`）
+***Transformer块***：包括multi head self-attention与MLP两部分中的参数，self-attention本身不包含参数，但是multi head self-attention中会把所有进入的Q、K、V分别做一次投影，每次投影的维度为64（`A * 64=H`）；MLP包含两个全连接层（第一个全连接层输入是`H`，输出是`4 * H`，参数量`H^2 * 4`；第二个全连接层输入是`4 * H`，输出是`H`，参数量`H^2 * 4`）
 > Multi head self-attention参数量=`H^2 * 4`，MLP参数量=`H^2 * 4 + H^2 * 4 = H^2 * 8`，整个transformer block的参数量为`H^2 * 4 + H^2 * 8 = H^2 * 12`，L 个 blocks的参数量=`L * H^2 * 12`
 
 BERT总参数量=`30k * H`（嵌入层）+ `L * H^2 * 12`（L个transformer块），以BERT_base为例`H=768`，`L=12`，总参数量=1.1亿（即`110M`）
@@ -88,13 +88,13 @@ BERT总参数量=`30k * H`（嵌入层）+ `L * H^2 * 12`（L个transformer块�
 
 **BERT输入的序列是如何构成的**
 
-*切词*
+***切词***
 
 假设按照空格切词，每个词作为一个token，如果数据量比较大，会导致切出的词典特别大，可能是百万级别，由之前计算模型参数的方法可知，若是百万级别就会导致模型的整个可学习参数都在嵌入层上。
 
 WordPiece，如果一个词出现的频率比较低，则应该把它切开，然后只保留一个词频率较高的子序列。这样的话，可以把一个相对来说比较长的文本，切成很多片段，而且这些片段是经常出现的，进而可以用一个相对来说比较小的词典（30k）就可以表示一个比较大的文本了。
 
-*序列构成*
+***序列构成***
 
 BERT的输入序列，第一个词永远是[CLS]（classification），其输出代表整个序列的信息
 
@@ -108,12 +108,75 @@ BERT的输入序列，第一个词永远是[CLS]（classification），其输出
 
 最终所构成的序列：`[CLS][Token1]...[TokenN][SEP][Token1']...[TokenN']`
 
-*输入-输出*
+***输入-输出向量化表示***
 
 <img src="https://user-images.githubusercontent.com/22740819/145942921-7ed8cde2-d193-45bd-b169-dfed380de035.png" width=600>
 
+在将句子切词、序列化之后，送入transformer之前，是需要对输入序列（每个token）进行向量化表示的（上图中黄色部分）；每个token被embedding之后送入transformer，然后输出该token新的embedding表示（上图中绿色部分）。所以，BERT是一个序列到序列的模型。针对下游任务，添加额外的输出层，将由bert得到的token embedding映射为想要的结果。
 
+
+<img src="https://user-images.githubusercontent.com/22740819/145993078-ef5cc313-f930-4e0f-8f20-d716499e28b3.png" width=600>
+
+对于每个词元token进入BERT的向量表示（token embedding），是由token、segment以及position embedding三者相加获得。
+- token embedding: token本身的embedding
+- segment embedding: 该token是属于第一个句子还是第二个句子的embedding
+- position embedding: 该token在句子中位置的embedding
+
+### BERT Pre-training部分
+
+预训练阶段两个关键部分：目标任务和预训练的数据
+
+**目标任务1: Masked LM**
+
+Masked LM实际是一个**完形填空**任务。对于一个输入BERT的词元序列，如果一个token是有WordPiece生成的，那么它有15%的的概率被替换成一个掩码，但是对于特殊的token不做替换（[ CLS ]和[SEP]）。假如输入序列是1000个token，那么该任务需要预测其中的150个被mask掉的词。 
+
+Masked LM存在的问题：在做掩码时，会将词元替换成特殊符号[MASK]，所以在pre-training阶段会看到输入中有15%的[MASK]，但是在fine-tuning阶段是没有[MASK]这个东西的（因为微调时不用Masked LM这个目标任务）
+> 解决方法：对于被选中的15%去做掩码的token，有80%的概率真的将其替换成[MASK]，10%的概率将其替换成一个随机的token，还有10%的概率该token保持不变，但是让它用于预测使用。
+
+**目标任务2: Next Sentence Prediction(NSP)**
+
+一个给定的序列包含两个句子a和b，其中有50%的概率在原文之中句子b确实是在句子a之后，还有50%的概率句子b是从另外一个地方随机选取出来的一个句子（其实就是50%的样本为正例，50%的样本为负例），该任务就是预测句子b是否为句子a的下一句。
+
+该预训练任务对QA、推理等下游任务有明显的增益。
+
+**Pre-training data**
+
+- BooksCorpus：具有8亿个词
+- Englishi Wikipedia：25亿个词
+
+预训练时应该使用文本级别（document-level）的预料，即送进去的时一篇一篇的文章，而不是一些随机打乱的句子。因为Transformer本身可以处理比较长的序列，输入整体的文本效果会更好一些。
+
+### BERT Fine-tuning部分
+
+**BERT与一些基于encoder-decoder架构的模型（如transformer）的区别？**
+
+- BERT预训练时的输入是整个文章或者一些句子对，由于self-attention机制导致可以在两端之间相互看到，但是基于encoder-decoder的结构里，一般encoder是看不到decoder的东西的，这里BERT会更好一些（不太理解），所付出的代价是BERT不能像Transformer那样来做机器翻译任务了。
+
+**下游任务**
+
+针对下游任务，只需要设计输入和输出，模型架构不需要变。即只需考虑你的输入如何改造成BERT所需要的句子对：
+
+- 如果你的下游任务也有两个句子作为输入，那就是句子A和B
+- 如果你的下游任务也有一个句子作为输入（比如句子分类），那么相当于句子B是省略的
 
 ## Part7. 实验
 
+**任务1:GLUE (General Language Understanding Evaluation)**
+
+这是一个句子层面的分类任务，[CLS]的BERT输出加一个输出映射就可以得到最终的输出。
+
+**任务2:SQuAD (Stanford Question Answering Dataset)**
+
+这是斯坦福的一个QA数据集，QA任务就是给定一段话，然后问你一个问题，需要你把答案找出来。答案已经在给定的那段话中，只需要把答案对应的那个片段找出来就可以（片段的开始和结尾），实际操作时就是对每一个token，来判断一下它是不是答案的开头或者结尾，具体的就是对每个token学习得到两个向量S和E，分别代表其作为答案的开始和结尾的概率。
+
+**任务3: SQuAD 2.0**
+
+同上
+
+**任务4:SWAG**
+
+这是一个用来判断两个句子之间关系的任务。
+
 ## Part8. 评论
+
+略。
