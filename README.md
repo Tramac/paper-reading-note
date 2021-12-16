@@ -4,5 +4,6 @@
 
 - [x] [Transformer](./notes/001_transformer.md)
 - [x] [BERT](./notes/002_bert.md)
-- [ ] ViT
+- [x] [ViT](./notes/003_vit.md)
 - [ ] MAE
+- [ ] MOCO
