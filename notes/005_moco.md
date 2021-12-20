@@ -59,6 +59,18 @@
 
 ## Part6. MoCo方法
 
+***1.Contrastive Learning as Dictionary Look-up***
+
+目前的对比学习都可以看作是训练一个编码器，从而去做一个字典查找的任务
+
+假设，给定一个编码后的query特征`q`，和一系列编码好的样本`{k_0, k_1, k_2, ...}`，这些可以看作是一个字典里的key，而且在这个字典里只有一个key和query是配对的（互为正样本对），记为`k_+`
+
+- 对比损失应该所具有的性质：当`q`和唯一正样本`k_+`相似时，loss值应该比较低，当`q`与其它不相似的样本距离比较远时，loss值也应该比较低
+- InfoNCE loss: noise contrastive estimation，把多分类问题简化成一系列二分类问题，其中一个是数据类别data sample，另一个是噪声类别noise sample，每次去拿数据样本和噪声样本做对比（**建议反复看视频，33:58～41:23**）
+
+<img src="https://user-images.githubusercontent.com/22740819/146709578-4cd42c01-bf49-4e1b-ab0e-a02861d9a893.png" width=200>
+
+
 ## Part7. 实验
 
 ## Part8. 总结
