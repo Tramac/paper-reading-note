@@ -38,7 +38,24 @@
 
 ## Part5. 相关工作
 
-- 无监督/自监督学习一般有两个方向可以做：1.代理任务(pretext task)；2.损失函数
+无监督/自监督学习一般有两个方向可以做：1.代理任务(pretext task)；2.损失函数
+
+***1.Loss Function***
+
+- 生成式目标函数：衡量模型的输出和target之间的差距（新建图与原图之间的差异），比如L1、L2 loss
+- 判别式目标函数：假如将图像分为九宫格，给定中间位置信息和任意一块信息，预测这两个块的方位（转换成了分类问题），这就是一种判别式网络的做法
+- Contrastive losses: 在一个特征空间里，衡量各个样本之间的相似性，相似特征的目标尽量近，否则尽量远
+> 与生成式和判别式网络的目标函数的区别：生成式和判别式的目标都是固定的，而对比学习的目标函数是在训练过程中不断改变的（在训练过程中，目标是由一个编码器提取出来的特征而决定的）
+- Adversarial losses: 主要衡量的是两个概率分布之间的差异，主要用来做无监督的数据生成的任务
+
+***2.Pretext Tasks***
+
+- denoising auto-encoders: 重建整张图
+- context autoencoders: 重建某个patch
+- colorization: 给图片上色做监督信号
+- form pseudo-labels: 给数据伪标签
+
+不同的代理任务是可以和某些Contrastive losses配对使用的，比如MoCo使用的instance discrimination和NCE
 
 ## Part6. MoCo方法
 
