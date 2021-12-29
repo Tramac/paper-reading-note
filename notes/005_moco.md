@@ -67,6 +67,7 @@
 
 - 对比损失应该所具有的性质：当`q`和唯一正样本`k_+`相似时，loss值应该比较低，当`q`与其它不相似的样本距离比较远时，loss值也应该比较低
 - InfoNCE loss: noise contrastive estimation，把多分类问题简化成一系列二分类问题，其中一个是数据类别data sample，另一个是噪声类别noise sample，每次去拿数据样本和噪声样本做对比（**建议反复看视频，33:58～41:23**）
+> 在对比学习任务中，每个图片自成一类，对ImageNet来说就不再是1000分类，而是128w个类别，如果使用交叉熵函数作为监督信号，其中的K值为128w，而softmax操作在K很大时是无法工作的，同时还有exp操作，当向量的维度是几百万时，计算复杂度是相当高的，所以这里采用的是InfoNCE作为监督函数
 
 <img src="https://user-images.githubusercontent.com/22740819/146709578-4cd42c01-bf49-4e1b-ab0e-a02861d9a893.png" width=200>
 
