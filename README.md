@@ -6,4 +6,5 @@
 - [x] [BERT](./notes/002_bert.md)
 - [x] [ViT](./notes/003_vit.md)
 - [x] [MAE](./notes/004_mae.md)
-- [ ] MOCO
+- [x] [MOCO](./notes/005_moco.md)
+- [ ] 对比学习串烧
