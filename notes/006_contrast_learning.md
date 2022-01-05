@@ -30,3 +30,24 @@ InstDisc也是一个里程碑式的工作，它不仅提出了个体判别的代
 <img src="https://user-images.githubusercontent.com/22740819/148056255-0c7ca030-75c5-4824-bbb8-56c067aeba96.png" width=400>
 
 该论文的方法就是基于最基本的对比学习。同样的图片经过编码器之后得到的特征应该很类似，不同图片的特征应该不相似。也就是说对于相似的图片、物体，它们的特征应该保持不变型（Invariant），对于不相似的图片它们的特征应该分散开（Spreading）。
+
+<img src="https://user-images.githubusercontent.com/22740819/148180616-06ecbd10-d8b0-4501-9b33-4a09317f6094.png" width=600>
+
+- 代理任务：个体判别
+- 正负样本的选取：batch内图片经过数据增强得到其对应的正样本，而负样本为batch内剩余的其它所有图片（包括原始图片以及数据增强后的图片）。假如batch_size=256，那么batch内正样本的数量为256，负样本的数量为(256 - 1) * 2。这种batch内选取负样本的方式可以使得用一个编码器进行端到端的训练。
+
+该文章的思路和SimCLR的思路差不多，但效果不如SimCLR，主要还是字典不够大，batch_size仅为256，同时缺少SimCLR中多样的数据增强方式以及MLP模块。
+
+## 3.CPC
+
+[Representation Learning with Contrastive Predictive Coding](https://arxiv.org/pdf/1807.03748.pdf)
+
+以上两篇工作都是使用个体判别作为代理任务，而这篇文章是利用其他代理任务进行对比学习的。
+
+机器学习中，一般可分为判别式模型和生成式模型。个体判别显然是属于判别式范畴，而本文中的预测性任务则属于生成式模型。
+
+<img src="https://user-images.githubusercontent.com/22740819/148183946-7acb2447-2fe5-4478-8010-1e921fc3991c.png" width=600>
+
+CPC中提出的模型是一个通用的结构，不仅可以处理音频，而且还可以处理图片、文本以及在强化学习中使用。
+
+假设给定一个时序的序列
