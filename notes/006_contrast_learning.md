@@ -59,3 +59,5 @@ CPC思想比较普适，假如输入序列为text，任务可以是用前面的�
 ## 4.CMC
 
 [Contrastive Multiview Coding](https://arxiv.org/pdf/1906.05849.pdf)
+
+CMC中定义正样本的方式更为广泛，它认为一个物体的很多个视角都可以被当作是正样本。
