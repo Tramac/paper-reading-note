@@ -87,7 +87,7 @@ CMC的局限性：当处理不同的视角时，需要使用不同的编码器�
 
 MOCO的主要贡献就是把之前对比学习的方法，都归纳总结为一种字典查询问题，它提出了队列与动量编码器两个东西，从而去形成一个又大又一致的字典，能帮助更好的对比学习。
 
-## SimCLR v1
+## 6.SimCLR v1
 
 <img src="https://user-images.githubusercontent.com/22740819/149864558-14dd4d7b-62ed-4c04-9886-abfbce8c2434.png" width=600>
 
@@ -112,3 +112,28 @@ SimCLR和Inva Spread非常相似，主要区别是：
 
 - 对于数据增强，其中最有效的为crop以及color变换，其余的增强方式只是锦上添花，可有可无的
 - 对于MLP，linear+relu优于只用linear，优于不使用mlp，使用mlp比不使用提了10个点，至今无法解释
+
+## 7.MOCO v2
+
+MOCO v2是一个只有两页的技术报告，它在MOCO的基础上借鉴了SimCLR中的MLP和数据增强。
+
+<img src="https://user-images.githubusercontent.com/22740819/149939378-476b78de-2ce5-4616-a54c-ba3a3123e750.png" width=400>
+
+MOCO v2相对于MOCO的改进点：
+
+- 添加一个MLP层；
+- 利用更多的数据增强；
+- 使用cosine的lr衰减方式；
+- 更多的epoch；
+
+## 8.SimCLR v2
+
+<img src="https://user-images.githubusercontent.com/22740819/149940841-269fc890-1806-436b-bde8-9e725ee4e548.png" width=600>
+
+SimCLR v2提出了一套用自监督网络作半监督训练的流程。该流程是用大的网络（SimCLR v2）作自监督的预训练，预训练部分是没有特定下游任务的，因此不具备下游任务知识；之后使用少量有标注数据对模型进行微调，从而让模型学习下游任务的特定知识；然后让微调的模型作为teacher模型，为更多的数据打伪标签，从而实现自学习。
+
+SimCLR v2相对于SimCLR的改进点：
+
+- 使用更大的模型，resnet50 -> resnet152，并且使用selective kernels；
+- 将一层MLP变为两层MLP；
+- 使用动量编码器；
