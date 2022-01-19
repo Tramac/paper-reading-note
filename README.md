@@ -7,4 +7,5 @@
 - [x] [ViT](./notes/003_vit.md)
 - [x] [MAE](./notes/004_mae.md)
 - [x] [MOCO](./notes/005_moco.md)
-- [ ] 对比学习串烧
+- [x] [对比学习串烧](./notes/006_contrast_learning.md)
+- [ ] Swin Transformer
