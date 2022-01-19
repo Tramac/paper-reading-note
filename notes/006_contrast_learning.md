@@ -205,17 +205,17 @@ BYOL的神奇之处就是它没有使用任何形式的负样本，也得到了�
 
 SimSiam不需要以上三个对比中常用的条件，不仅没有模型坍塌，而且取得了不错的效果。
 
-<img src="https://user-images.githubusercontent.com/22740819/150077394-42f3b27b-e0c9-440f-8b84-af27d12903e5.png" width=500>
+<img src="https://user-images.githubusercontent.com/22740819/150077394-42f3b27b-e0c9-440f-8b84-af27d12903e5.png" width=400>
 
 之所以叫simsiam network（孪生网络）是因为两个编码器`f`的结构一般是一样的，并且是共享参数的。
 
-<img src="https://user-images.githubusercontent.com/22740819/150078411-d8b9271a-e01c-4859-805e-ec28562520d8.png" width=500>
+<img src="https://user-images.githubusercontent.com/22740819/150078411-d8b9271a-e01c-4859-805e-ec28562520d8.png" width=400>
 
 整体架构与BYOL非常类似，前向过程是给定一个mini-batch图像`x`，经过两次数据增强变为`x1`和`x2`，之后经过孪生的encoder `f`，得到特征表示`z1`和`z2`，然后经过predictor得到`p1`和`p2`，之后用`p1`预测特征`z2`，用`p2`预测`z1`，这里与BYOL唯一的不同是它没有用动量编码器
 
 之所以SimSiam能够成功训练，不会有模型坍塌，主要是因为有stop gradient这个操作存在，由于这个操作，SimSiam结构可以想象成一个EM算法。
 
-<img src="https://user-images.githubusercontent.com/22740819/150078901-05a7b7aa-3fe1-408a-8878-c9954fd5284f.png" width=500>
+<img src="https://user-images.githubusercontent.com/22740819/150078901-05a7b7aa-3fe1-408a-8878-c9954fd5284f.png" width=400>
 
 SimSiam与其它基于孪生网络的对比：SimCLR使用的是端到端的训练，两个encoder；SwAV是和聚类中心进行对比；BYOL是一个预测任务，同时使用使用的是动量编码器；SimSiam也是预测任务，但是没有使用动量编码器，使用的是stop gradiant的方式进行预测的。
 
@@ -229,13 +229,32 @@ SimSiam与其它基于孪生网络的对比：SimCLR使用的是端到端的训�
 
 MOCO v3其实就是做了一个很直接、很小的一个改动，让自监督的ViT训练变得更稳定。
 
-<img src="https://user-images.githubusercontent.com/22740819/150080097-172ff404-9e67-4b9e-9e86-03b9b1c10934.png" width=500>
+<img src="https://user-images.githubusercontent.com/22740819/150080097-172ff404-9e67-4b9e-9e86-03b9b1c10934.png" width=400>
 
 从伪代码看，MOCO v2相当于是MOCO v2与SimSiam的一个合体。MOCO v3还是有两个编码器`f_q`与`f_k`，其中`f_k`使用动量更新，目标函数使用的是对比学习的loss，从该角度看与MOCO v2类似，但从细节看，`f_q`是由backbone + project mlp + predictor mlp组成，这里其实就和BYOL或者SimSiam类似，而且loss的计算是一个对称项，很像SimSiam。
 
-<img src="https://user-images.githubusercontent.com/22740819/150080902-6ebc2b1f-0419-4e26-9d51-f64c3cb9e5df.png" width=500>
+<img src="https://user-images.githubusercontent.com/22740819/150080902-6ebc2b1f-0419-4e26-9d51-f64c3cb9e5df.png" width=400>
 
 从上图来看，把resnet50替换成ViT，当batchsize比较小时1024～4096，效果还可以，但是当batchsize比较大时（6144），训练将很不稳定，并且最终结果不如小batchsize。
 
 针对以上问题，作者观察了一下模型梯度回传时候的梯度变化情况。当每次loss有大幅的震动，导致准确度大幅下降的时候，梯度也会有一个波峰，而且波峰发生在第一层，也就是在做patch projection时（也就是一个可训练的全连接层），由于这一层经常出现问题，所以作者尝试将这一层随机初始化然后冻住，不参与训练，得到了很平滑的loss曲线。该trick不仅对MOCO v3有用，对BYOL也有不错的效果。
 
+## 13.DINO
+
+[Paper](https://arxiv.org/pdf/2104.14294.pdf)
+
+<img src="https://user-images.githubusercontent.com/22740819/150086689-e6675211-75e5-4aa8-a3f3-145759087fb8.png" width=400>
+
+DINO也是一种使用自监督训练ViT的方式，它换了一种视角解释架构，将整个框架看作是自蒸馏的架构。在MOCO中，左侧为query encoder，右侧为key encoder，对于BYOL来说，左侧为online network，右侧为target network，而DINO是延续了BYOL，它只不过换了个名字，将左侧称为student network，右侧为teacher network，因为student要去预测teacher的输出，可将teacher的输出看作是ground truth。具体前向过程和BYOL和SimSiam比较类似。
+
+为了避免模型坍塌，DINO在teacher network中做了一个centering操作，就是对batch中的样本求均值，之后让batch中的所有样本减去均值，可看作对batch中的样本求归一化的操作。
+
+<img src="https://user-images.githubusercontent.com/22740819/150087601-2c54ee5f-e0e6-4385-bb67-5119b8275ca0.png" width=400>
+
+从伪代码来看，和MOCO v3非常相似，只有目标函数处多了一个centering操作。
+
+----------------------
+
+<img src="https://user-images.githubusercontent.com/22740819/150088205-15d79db2-9d70-4af6-92c4-e892e578dd0d.png" width=600>
+
+最后做一下总结。
