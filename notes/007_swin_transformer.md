@@ -10,6 +10,12 @@ Swin Transformer想让vision transformer像卷积神经网络一样，也能够�
 
 ## Part2.摘要
 
+Swin Transformer可以被用来作为CV领域的一个通用的骨干网络，而ViT当时只做了分类任务，虽然当时可以看到Transformer在视觉领域的潜力，但是并不确定是不是在所有的视觉任务上都可以做好，而Swin Transformer证明了是可以的。
+
+直接将Transformer从NLP迁移至CV领域主要面临两个挑战：
+
+- 尺度问题：假如一张街景图片，其中代表同样语义词的物体尺寸大小不一，比如汽车，而NLP中不存在此问题；
+
 ## Part3.引言
 
 ## Part4.结论
