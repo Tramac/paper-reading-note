@@ -44,12 +44,30 @@ Swin Transformer可以被用来作为CV领域的一个通用的骨干网络，�
 
 <img src="https://user-images.githubusercontent.com/22740819/150480563-2ba49171-8fc0-4a47-954d-29f5d321f554.png" width=400>
 
+假设，在Transformer第L层，将输入或特征图分成4个小窗口，就会有效的降低序列长度，从而减少计算复杂度。图中，灰色的小patch为最基本的单元（4x4像素大小的patch），每一个红色的框是一个中型的计算单元（窗口），在Swin Transformer中，一个窗口中默认有7x7=49个小patch。shift操作就是将整个特征图（示意图中的4个窗口）往右下角整体移动两个patch，变成了右图中的格式。然后在新的特征图中，再次把它分成4个窗口，最终得到了9个窗口。
 
-
+shift的好处是窗口与窗口之间可以进行互动了。如果没有shift操作，各个窗口之间都是不重叠的，如果每次自注意力操作都在窗口内进行，那一个窗口里的patch永远无法注意到其它窗口中patch的信息，这就无法达到使用transformer的初衷了（更好的理解上下文）。如果这些窗口都不重叠，那么自注意力就变成了孤立自注意力了，就没有了全局建模的能力。shift之后，一个窗口的中patch可能会跑到另外一个窗口中，与新的patch进行交互，而这些新窗口中的patch可能是上一层来自其它窗口的patch，最终就达到了cross-window connection，窗口与窗口之间可以交互了，再配合上后面的patch merging，合并到transformer最后几层时，每一个patch本身的感受野已经很大了。再加上shift window操作，所谓的窗口内的局部自注意力也就变相的等于是一个全局自注意力操作了，即省内存效果也好。
 
 ## Part4.结论
 
+Swin Transformer是一个层级式的Transformer，而且它的计算复杂度是跟输入图像的大小呈线性增长。
+
+Shifted Window操作，它对很多视觉的任务，尤其是对下游密集预测型的任务是非常有帮助的。
+
 ## Part5.模型整体架构
+
+<img src="https://user-images.githubusercontent.com/22740819/150487310-377ba080-060e-4fd0-b32b-b41a4f85ae30.png" width=800>
+
+
+**前向过程**
+
+第一阶段：patch projection + transformer block * 2
+
+给定一张224x224x3大小的图片，首先将图片分成patch，swin transformer中patch大小为4x4（ViT中为16x16），分块之后大小为56x56x48，然后经过linear embedding，将输入向量化得到张量大小为56x56x96。
+
+> 在transformer计算中，前面的56x56会拉直变成3136（序列长度），输入特征则变成3136x96（ViT中，patch为16x16，序列长度为196），而3136长的序列对Transformer还是太长，所以因为了窗口计算，每个窗口里只有7x7=49个patch，相当于序列长度只有49，解决了计算复杂度问题。
+
+Transformer本身不改变输入尺寸，在经过两层transformer block之后，输出大小还是56x56x96。
 
 ## Part6.窗口自注意力
 
