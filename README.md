@@ -8,4 +8,4 @@
 - [x] [MAE](./notes/004_mae.md)
 - [x] [MOCO](./notes/005_moco.md)
 - [x] [对比学习串烧](./notes/006_contrast_learning.md)
-- [ ] Swin Transformer
+- [x] [Swin Transformer](./notes/007_swin_transformer.md)
