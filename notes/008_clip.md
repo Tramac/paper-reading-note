@@ -84,4 +84,16 @@ CLIP将预测性任务替换为对比型的任务，训练效率提高了4倍。
 
 **5.1 Zero-Shot Transfer**
 
-之前自监督或无监督的方法，它们主要是研究的是特征学习能力，目标是学得一种泛化能力比较好的特征，比如MoCo，SimCLR等。即便有了好的特征，当应用到下游任务时，还是需要有标签的数据进行finetune，
+之前自监督或无监督的方法，它们主要是研究的是特征学习能力，目标是学得一种泛化能力比较好的特征，比如MoCo，SimCLR等。但即便有了好的特征，当应用到下游任务时，还是需要有标签的数据进行finetune，这时又会面临一些问题，比如下游任务的数据不好收集，或者数据分布有偏移等。
+
+Zero-Shot Transfer是说，我们致力于训练好一个模型，接下来就不用再去训练或finetune了。
+
+***Zero-Shot Transfer具体是如何做的***
+
+<image src="https://user-images.githubusercontent.com/22740819/155678059-efe6fd57-4490-4332-9d81-b06642390fef.png" width=600>
+
+当CLIP预训练完之后会有两个编码器，即Image Encoder和Text Encoder。
+  
+  - 给定一张图像，通过Image Encoder得到图像特征I1；
+  - 文本侧的输入则是一些感兴趣的标签，比如我们有plane、car、dog、bird四个标签，首先这些标签会通过prompt engineering生成四个句子，比如A photo of a {object}，然后将这四个句子分别通过Text Encoder得到四个文本特征T1，...，T4；
+  - 然后计算四个文本特征T1~T4与图像特征I1之间的余弦相似性cosine similarity，最后得到的相似度通过softmax层得到概率分布，这时概率最大（相似度最高）的句子大概率就是在描述你的输入图像，也就是说句子中所包含的物体就是你输入图像里应该有的物体。
