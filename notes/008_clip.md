@@ -127,7 +127,7 @@ Zero-Shot Transfer是说，我们致力于训练好一个模型，接下来就�
     
   对于一些更难的数据集，比如文本分类，用CLIP zero-shot transfer做不是很合理，应该用few-shot方式。
   
-  **6.2 Zero-Shot CLIP vs Few-Shot CLIP vs other Few-Shot
+  **6.2 Zero-Shot CLIP vs Few-Shot CLIP vs other Few-Shot**
   
   <image src="https://user-images.githubusercontent.com/22740819/155923166-93f9779b-b35b-4598-8a12-40ae53eebe6b.png" width=300>
   
@@ -136,3 +136,36 @@ Zero-Shot Transfer是说，我们致力于训练好一个模型，接下来就�
   - Zero-Shot CLIP比之前专做Few-Shot迁移的BiT-M方法结果好；
   - 对CLIP来说，当样本比较少时(1～4)用了训练样本的Few-Shot反而不如Zero-Show效果好；
   - 随着训练样本的增多，Few-Shot CLIP的效果是最好的；
+  
+  **6.3 Zero-Shot vs Few-Shot vs 全部数据做linear probe**
+  
+  linear probe: 将预训练好的模型冻住，只拿全部数据训练一个分类头做预测。
+    
+  fine-tune: 不把backbone冻住，用全部数据微调所有参数。由于CLIP所使用的数据很大，fine-tune效果应该很好，而且CLIP的目标主要是做一个好的预训练模型，所以不用fine-tune做对比了。
+  
+  <image src="https://user-images.githubusercontent.com/22740819/155935791-25dc37a4-2bb1-4bda-b41e-f12df9de27f1.png" width=600>
+  
+  从右图结果可看，即便用所有数据训练，CLIP效果也是更好。
+  
+  **6.3 CLIP vs ImageNet上最好模型--EfficientNet L2 NS
+  
+  <image src="https://user-images.githubusercontent.com/22740819/155936322-54cc7e8c-6852-4fb1-a18b-5beaef91b9fe.png" width=300>
+
+  结果显示，在27个数据集上，其中有21个CLIP的结果优于EfficientNet L2 noisy student。
+  
+  **6.4 CLIP预训练模型的鲁棒性**
+    
+  <image src="https://user-images.githubusercontent.com/22740819/155936717-0ea0d8db-2799-4718-9536-844f5a695a0d.png" width=600>
+  
+  当下游任务的数据与预训练数据分布有偏移时，CLIP的效果退化相对也不是很多。
+
+## Part7.CLIP的局限性
+  
+  - CLIP与基线的ResNet50相比确实是有些优势，ImageNet上准确都是76.2+，但是现在一些SOAT方法比如MAE等都到了90+，这十几个点的差距靠扩大数据等方法还是有些吃力的；
+  - CLIP zero-shot在某些数据集上效果其实不如ResNet50，比如细分类数据集或者比较抽象的数据，或者更难的下游任务上；
+  - CLIP在做迁移时，如果下游任务的数据与预训练任务的数据分布差异特别大，泛化效果也不是很好，比如MNIST就不行；
+  - CLIP虽然可以zero-shot预测结果，但还是从给定的固定类里去做选择，目前对生成式的任务没有好的方法；
+  - 对数据的利用还不是很高效，需要大量的数据投喂，如果能减少数据用量也很好；
+  - 实验过程中一直是在使用ImageNet和其它27个数据集做对比，无形之中引入了偏见；
+  x
+  
