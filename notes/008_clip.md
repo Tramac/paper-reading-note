@@ -97,3 +97,23 @@ Zero-Shot Transfer是说，我们致力于训练好一个模型，接下来就�
   - 给定一张图像，通过Image Encoder得到图像特征I1；
   - 文本侧的输入则是一些感兴趣的标签，比如我们有plane、car、dog、bird四个标签，首先这些标签会通过prompt engineering生成四个句子，比如A photo of a {object}，然后将这四个句子分别通过Text Encoder得到四个文本特征T1，...，T4；
   - 然后计算四个文本特征T1~T4与图像特征I1之间的余弦相似性cosine similarity，最后得到的相似度通过softmax层得到概率分布，这时概率最大（相似度最高）的句子大概率就是在描述你的输入图像，也就是说句子中所包含的物体就是你输入图像里应该有的物体。
+
+  e.g.以ImageNet为例，如果对ImageNet中所有图片进行推理：对每个类生成一个句子，则会生成1000个句子，然后对于每张图片与这1000个句子计算相似性。
+
+ **5.2 Prompt Engineering And Ensembling**
+  
+  ***Prompt Engineering***
+  
+  Prompt: 可理解为“提示”的意思，prompt engineering主要起到提示的作用或者说文本引导作用。
+  
+  ***为什么要做Prompt Engineering？***
+  
+  - Polysemy：多义性，也就是一个单词同时可能拥有很多的含义。如果在做文本/图像匹配时，每次只用一个单词做文本特征提取，就有可能面临这种问题。比如在ImageNet中同时存在着两个类construction cranes与cranes，前者指起重机，后者是鹤，如果不加任何语境只用cranes提取特征，那么特征很可能是有歧义的。
+  - 预训练时，文本侧一般也都是一个句子，如果在做推理时每次输入的只是一个单词，就会存在distribution gap问题，提出的特征可能就不是很好。
+  
+  基于以上两个原因，本文提出了prompt template的方式，也就是给定一个提示模板，把标签放入模板中形成一个句子。从单词到句子首先解决了distribution gap问题，而且模板一般是“A photo of a {label}."，在此语境中label一般是名词，同时缓解了歧义问题。
+  
+  ***Prompt Ensembling***
+  
+  Prompt Ensembling就是多用一些提示模板，做多次推理，然后把结果综合起来，ensemble一般都可以得到更好的结果。
+  
