@@ -80,7 +80,7 @@ CLIP将预测性任务替换为对比型的任务，训练效率提高了4倍。
 - 调参时，只使用ResNet50训练1个epoch进行对比；
 - 训练时，batch size为32768，非常大；
   
-## Part5.实验
+## Part5.Zero-Shot与Prompt Engineering
 
 **5.1 Zero-Shot Transfer**
 
@@ -117,3 +117,22 @@ Zero-Shot Transfer是说，我们致力于训练好一个模型，接下来就�
   
   Prompt Ensembling就是多用一些提示模板，做多次推理，然后把结果综合起来，ensemble一般都可以得到更好的结果。
   
+## Part6.实验
+  
+  **6.1 CLIP vs ResNet50**
+  
+  <image src="https://user-images.githubusercontent.com/22740819/155922497-407b6990-34a5-4c29-806a-ebe12e0cbe16.png" width=300>
+    
+  其中，CLIP是预训练后直接做zero-shot transfer，ResNet50是只用resnet50提取特征，然后接线型分类头预测。结果显示，在27个数据上其中16个CLIP结果更好，一般对于给物体进行分类的数据集来说，CLIP结果一般会更好。
+    
+  对于一些更难的数据集，比如文本分类，用CLIP zero-shot transfer做不是很合理，应该用few-shot方式。
+  
+  **6.2 Zero-Shot CLIP vs Few-Shot CLIP vs other Few-Shot
+  
+  <image src="https://user-images.githubusercontent.com/22740819/155923166-93f9779b-b35b-4598-8a12-40ae53eebe6b.png" width=300>
+  
+  Few-Shot：相比于Zero-Shot直接做预测，Linear Probe方式是将backbone冻住提取特征，然后用有标签数据训练得到分类头，由于也算是见到了样本，可以认为是Few-Shot。
+  
+  - Zero-Shot CLIP比之前专做Few-Shot迁移的BiT-M方法结果好；
+  - 对CLIP来说，当样本比较少时(1～4)用了训练样本的Few-Shot反而不如Zero-Show效果好；
+  - 随着训练样本的增多，Few-Shot CLIP的效果是最好的；
