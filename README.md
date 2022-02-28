@@ -9,4 +9,4 @@
 - [x] [MOCO](./notes/005_moco.md)
 - [x] [对比学习串烧](./notes/006_contrast_learning.md)
 - [x] [Swin Transformer](./notes/007_swin_transformer.md)
-- [ ] CLIP
+- [x] [CLIP](./notes/008_clip.md)
