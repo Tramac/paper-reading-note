@@ -11,3 +11,4 @@
 - [x] [Swin Transformer](./notes/007_swin_transformer.md)
 - [x] [CLIP](./notes/008_clip.md)
 - [x] [Two-Stream](./notes/009_two_stream.md)
+- [ ] I3D 
