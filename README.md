@@ -11,4 +11,5 @@
 - [x] [Swin Transformer](./notes/007_swin_transformer.md)
 - [x] [CLIP](./notes/008_clip.md)
 - [x] [Two-Stream](./notes/009_two_stream.md)
-- [ ] I3D 
+- [x] [I3D](./notes/010_i3d.md)
+- [ ] 视频理解论文串讲 
