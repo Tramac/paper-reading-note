@@ -58,5 +58,7 @@ DeepVideo是AlexNet出现之后第一个用比较深的卷积神经网络做大�
 
 ## Part3.Beyond-Short-Snippets
 
+[Paper](https://arxiv.org/pdf/1503.08909v2.pdf)
 
+Beyond Short Snippets: 
 
