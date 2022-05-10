@@ -181,3 +181,16 @@ TSN中这种给视频做temporal segment的思想，不光是可以作用于短�
 
 - 双流网络在UCF101上准确维88.0%，C3D效果相对并不好为85.2%，Two stream +LSTM对应的是Beyond-Short-Snippets文章，效果为88.6%，提升也不是很明显；
 - TSN用两个模态（RGB+光流）准确到94.0%；
+
+## 视频理解串讲前半部分的总结
+
+<img width="631" alt="image" src="https://user-images.githubusercontent.com/22740819/167637616-7d936d16-90f7-443b-a05c-3926faba9eea.png">
+
+- DeepVideo第一次将神经网络迁移到视频领域；
+- 由于视频中时序信息的重要性，Two-Stream提出了空间流和时间流的双流思想，大大提升了效果；
+- TDD是以沿着轨迹的方式对光流进行堆叠，LSTM的引入是为了更好的对时序信息建模，另外还有一些Early Fusion的工作；
+- 为了加强对长视频的理解，出现了TSN，对长视频进行分段，在融合每段的思想；
+- 在TSN的基础上，DVOF和TLE又引入了全局编码，去学得一个更加全局的video level的特征，其中DVOF不是端到端的，而TLE是端到端的。
+
+以上就是2014年～2017年视频领域中双流网络的一个发展历程，从UCF101数据集上的效果来看，从DeepVideo的65%提升到了TLE的96%。
+视频理解
