@@ -374,7 +374,7 @@ I3D的核心就是inflated操作，其出发点是C3D网络在大规模的数据
 #### 3.3.3 对比结果
 
 <div align=center>
-<img width="500" alt="image" src="https://user-images.githubusercontent.com/22740819/167838479-eb1dcaf7-b3be-448f-a5c8-58a6b039318d.png">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/22740819/167838479-eb1dcaf7-b3be-448f-a5c8-58a6b039318d.png">
 </div>
 
 - I3D的backbone由Inception替换成ResNet50之后会带来一个点的提升；
@@ -386,4 +386,165 @@ Non-local的主要贡献就是将自注意力操作引入到了视觉领域，�
 
 [Paper](https://arxiv.org/pdf/1711.11248.pdf)
 
+题目的意思就是对于动作视频任务，时空卷积到底应该如何用，2D or 3D或是2D+3D，是一篇非常具有实验性的论文。
 
+研究动机：作者发现，如果用2D网络对视频帧抽取特征然后预测在动作识别上的表现也很好，比3D网络差不了太多。既然2D网络的效果也不错，如果部分用一下2D卷积可能也不错，毕竟计算量比较低。经过实验之后发现，把一个3D的卷积改成一个空间上2D+时间上1D的网络效果更好。
+
+#### 3.4.1 网络结构对比
+
+
+<div align=center>
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/22740819/167981761-5917bd28-a43e-458d-bf64-770eb281022f.png">
+</div>
+
+- R2D：纯2D网络，视频抽帧然后过2D网络，预测；
+- MCx：先通过一些3D网络，在底层学一下时空特征，在上层再换成2D网络，降低计算复杂度；
+- rMCx：开始先把clip抽帧，每帧先经过2D网络，得到特征之后再用3D网络去做融合；
+- R3D：纯3D网络，也就是C3D、I3D的做法；
+- R(2+1)D：把3D卷积拆分成两个卷积，先做一个2D的spatial上的卷积，再做一个1D的temporal上的卷积；
+
+#### 3.4.2 参数量及效果对比
+
+<div align=center>
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/22740819/167982544-21a56952-06b5-4b07-8771-0f0912c0067e.png">
+</div>
+
+- 纯2D的网络参数量肯定是最少的，其它用到3D的参数量明显变高；
+- 结果上，纯用2D和纯用3D的效果都不太好，2D和3D混合用的相对会好一些，R(2+1)D是最好的。
+
+#### 3.4.3 (2+1)D的拆分方式
+
+<div align=center>
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/22740819/167983070-1f386c75-8770-4b2e-beac-62854e00e952.png">
+</div>
+
+由图所示，对于原始的txdxd的3D卷积核，(2+1)D的做法是先在空间上做dxd的卷积，然后做一次特征映射Mi（做映射是想降维，让参数量和纯3D网络保持一致），之后再在时间上做tx1x1的卷积。
+
+**(2+1)D这种拆分的方式比之前3D网络效果好的原因：**
+
+- 增强了网络的非线性：之前只有一个3D Conv，后面就只接了一个ReLU激活层，也就是只做了一次非线性操作；现在是做了两次卷积，两个ReLU，两个非线性变换，学习能力也就变强了；
+- 从优化角度看，直接学习一个3D Conv相对是不好学的，分成一个2D+1D会好优化一些
+
+#### 3.4.4 效果对比
+
+<div align=center>
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/22740819/167985779-0c094300-7d76-4c6d-83bc-8ccbb6a8afca.png">
+</div>
+
+与I3D对比，在K400上，无论是单独的RGB还是单独的Flow，R(2+1)D的效果都是更好一些，但是Two-Stream时，反而是I3D的效果更好。
+
+### 3.5 SlowFast
+
+[Paper](https://arxiv.org/pdf/1812.03982.pdf)
+
+#### 3.5.1 网络结构
+
+<div align=center>
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/22740819/167987605-850651f9-d498-4f4b-ae09-7c6fd35044e6.png">
+</div>
+
+SlowFast网络分为两个分支，Slow和Fast，假如给定一个包含64帧的视频（2s左右）：
+
+- Slow：以较低的帧率抽帧，比如每隔16帧取1帧，共取出4帧作为Slow分支的输入，该分支主要用于学习静态、场景信息；由于静态信息比较难描绘，所以大部分的网络参数都在Slow分支，该分支的网络结构比较大，其实就是一个I3D网络，但是输入只有4帧，相对而言计算复杂度并不是很高；
+- Fast：以较高的帧率抽帧，比如每隔4帧取1帧，共取出16帧作为Fast分支的输入，该分支主要用来描述运动信息；由于输入变多，为了维持整个模型的计算复杂度低一些，让fast分支的网络尽可能的小一些。
+
+整体来看，SlowFast也是一种双流的网络，只是没有用光流，分为慢分支与快分支，慢分支用小输入大网络，快分支用大输入小网络，两个分支之间再做一些later connection，对信息做一些交互，从而能够更好的学得时空特征。
+
+#### 3.5.2 前向计算过程
+
+<div align=center>
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/22740819/167989229-426ca32a-97fa-4a45-aa79-9fc2b4d5ccb0.png">
+</div>
+
+- Slow pathway其实就是一个以resnet50为架构的I3D网络；
+- Fast pathway相对slow而言主要是通道数做了一些衰减（图中橙色部分），意味是比较轻量的，但是整体架构也是一个resnet50结构的I3D版本；
+- SlowFast和之前的I3D，R(2+1)D相同，在时序上都没有进行下采样，可以看到特征图的尺寸，慢分支一直是4，快分支一直是32，因为帧本来就少，想多维持时序的信息，下采样只在空间上做；
+
+#### 3.5.3 结果对比
+
+<div align=center>
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/22740819/167990037-4f8c5768-ceb9-48bb-9613-8b49045a30a1.png">
+</div>
+
+SlowFast相对于其它的3D网络无论是在精度上还是计算复杂度上都有优势，也是3D网络范畴内的最好表现了。
+
+## Part4.Video Transformer
+
+随着vision transformer的火热，如何把图像领域的transformer运用到视频中也是一个重要的研究方向。
+
+### 4.1 TimeSformer
+
+[Paper](https://arxiv.org/pdf/2102.05095.pdf)
+
+题目：在视频理解领域，时空注意力是不是all you need。
+
+TimeSformer是一篇偏实验性的论文，探究了如何将图像领域的vision transformer迁移到视频领域。
+
+#### 4.1.1 结构尝试
+
+<div align=center>
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/22740819/168003966-f48a59ec-1ac8-4bbc-ac07-fd12d527dd6e.png">
+</div>
+
+- Space Attention: 只在空间特征图上做自注意力，其实就是图像中vision transformer所用的自注意力；
+- Joint Space-Time Attention: 在视频的三个维度上都做自注意力，这种方式很占显存；
+- Divided Space-Time Attention: 考虑到显存限制，将3D自注意力拆分成两部分，先在时间上做自注意力，再在空间上做自注意力，大大降低了复杂度，因为每个序列长度就变得很小；
+- Sparse Local Global Attention: 由于全局的序列长度太长，就现在局部计算，然后再全局计算，也会降低复杂度；
+- Axial Attention: 只沿着特征的轴做attention，先按时间轴做attention，再沿着横轴做，最后沿着纵轴做，把一个三维的问题拆成三个一维的东西；
+
+
+**自注意力计算方式的可视化解释**
+
+<div align=center>
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/22740819/168006392-4083ce20-a202-4e05-b263-a6bc311a5696.png">
+</div>
+
+每一列都是从t-1 -> t -> t+1的连续三帧图像：
+
+- Space Attention: 假设拿frame t中蓝色的patch为基准点，它只会跟它当前的这一帧去计算自注意力（frame t中红色区域），因为该方式就是图像上的自注意力，不牵扯时间轴；
+- Joint Space-Time Attention: 复杂度最高，对于frame t中的蓝色patch，会与前后帧以及自身的所有patch计算自注意力；
+- Divided Space-Time Attention: frame t中蓝色patch首先会和前后帧对应位置的patch(绿色)进行自注意力计算，然后在当前帧所有patch(红色)计算自注意力；
+- Sparse Local Global Attention: 对于蓝色patch，先计算局部小窗口内的自注意力(黄色区域)，再计算全局的自注意力(为了减少计算量做了稀疏，洋红色区域)；
+- Axial Attention: 对于蓝色patch，时间轴上先和绿色的patch计算自注意力，再在横轴上与黄色区域计算自注意力，最后在纵轴上与洋红色区域计算自注意力；
+
+结合效果和效率的考虑，文章中以Divided Space-Time Attention的方式提出了TimeSformer的架构。
+
+#### 4.1.2 消融实验
+
+<div align=center>
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/22740819/168008857-561b2a80-c9e2-4bba-ba93-fde58ccef56e.png">
+</div>
+
+- Divided Space-Time的方式相对而言，参数量适中，效果最好；
+- 只用2D的自注意力在K400上的效果也不错，因为K400是有些偏静态的，如果换成SSv2数据集效果下降很多；
+
+<div align=center>
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/22740819/168009284-1ef5a6c0-d148-4a1d-b312-109512efd362.png">
+</div>
+
+- 从计算复杂度来看，Divided Space-Time的复杂度基本是和输入尺寸成线性增长的，而Joint Space-Time近似指数增长，容易造成OOM；
+
+#### 4.1.3 结果对比
+
+<div align=center>
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/22740819/168009666-94abfac9-c09e-4b2f-a932-80065a80d06c.png">
+</div>
+
+TimeSformer对比了最经典的I3D和最新的SlowFast两种3D网络：
+
+- 从训练时间和做推理时的FLOPs来看，TimeSformer都是最低的，从效率上是优于之前的3D网络的；
+- 在效果上，TimeSformer-L用ImageNet-21K预训练，在K400上效果也能到80.7%；
+
+TimeSformer方法之后，vidtr、mvit、vivit等一系列video transformer的工作思想都差不多，基本都是考虑如何对时空自注意力做拆分。
+
+## 视频理解工作总结
+
+<div align=center>
+<img width="656" alt="image" src="https://user-images.githubusercontent.com/22740819/168011303-7a17e6c1-5fcb-4fee-be19-9e17358d15ff.png">
+</div>
+
+- DeepVideo：AlexNet之后，最早的将CNN用到视频理解领域中来，但是没有用到运动信息，效果不是很好，不如手工特征IDT的效果；
+- Two-Stream：加入光流图像，利用了运动信息，证明了时序信息的重要性；
+- 为了提高对更长视频的理解能力以及双流方法的融合方式，Beyond short snippts用lstm学习时序特征，Early Fusion考虑了空间和时间的其它融合方式，TDD根据光流的轨迹堆叠光流图；为了处理更长视频，TSN将视频分成多段，然后每段去做分析；在TSN基础上，结合全局建模，又有DOVF、TLE、ActionVLAD等工作提出；
+- 从C3D到I3D，开始用3D网络处理视频；在I3D的基础上，通过替换**2D backbone**有R3D、MFNet、STC等工作；考虑到3D的复杂度，出现了S3D、R(2+1)D、ECO、P3D等工作，基本都是把3D拆成了**2D+1D**；为了处理更**长序列输入**，提出了LTC、T3D、Non-local、V4D等工作；为了提**高效率**，出现了CSN、SlowFast、X3D等工作
+- Video Transformer：TimeSformer、VidTr、Vivit、Mvit都是考虑到自注意力的复杂度对video transformer进行改进。
