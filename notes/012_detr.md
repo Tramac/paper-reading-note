@@ -107,4 +107,11 @@ DETR每次出100个输出框，但实际上一个图片的GT box可能只有几�
 
 ### 5.2 网络框架
 
-<img width="729" alt="image" src="https://user-images.githubusercontent.com/22740819/182007905-89a53bf4-a404-48ee-9761-4111f279350f.png">
+<img width="715" alt="image" src="https://user-images.githubusercontent.com/22740819/182016059-629a0224-f70f-4c1b-aa6b-7b3c78ca387c.png">
+
+DETR前向过程：
+
+- 假设输入尺寸为3x800x1066，首先通过一个CNN得到特征，维度为2048x25x34（1/32），由于后续需送入transformer，通过1x1卷积降维至256x25x34；
+- 通过Positional encoding给transformer加入位置编码，这里用的是一个固定的位置编码，维度为256x25x34（因为需要和上面的特征相加，维度必须一致），相加之后就是transformer的输入；
+- 将特征拉直（25x34 -> 850）为850x256，其中850就是输入transformer的序列长度，256为transformer的head dimension；
+- 通过6个transformer encoder进行特征提取，输出的特征维度不变，仍然为850x256；
