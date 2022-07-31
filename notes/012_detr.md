@@ -115,3 +115,8 @@ DETR前向过程：
 - 通过Positional encoding给transformer加入位置编码，这里用的是一个固定的位置编码，维度为256x25x34（因为需要和上面的特征相加，维度必须一致），相加之后就是transformer的输入；
 - 将特征拉直（25x34 -> 850）为850x256，其中850就是输入transformer的序列长度，256为transformer的head dimension；
 - 通过6个transformer encoder进行特征提取，输出的特征维度不变，仍然为850x256；
+- object query（100x256）与encoder的输出（850x256）作为
+
+**object query**
+
+> object query是一个learnabel positional embedding，是可学习参数，维度为100x256，256是为了和backbone输出的维度对应，这样才可以一起做惩罚，100是告诉模型最后有100个输出框。其实可以将其理解为一种Anchor机制，或者是一种condition，就是给定一个条件之后，模型基于该条件做出判断。在transformer decoder中做的就是cross-attention，输入为object query和backbone+encoder输出的全局特征，通过一系列attention之后得到输出。
