@@ -96,4 +96,15 @@ DETR每次出100个输出框，但实际上一个图片的GT box可能只有几�
 
 由上可知，目标检测也可以转换成二分图匹配问题，abc看作是100个预测的框，xyz看作是GT_box，cost matrix中元素放的就是loss值，然后通过scipy.linear_sum_assignment包（匈牙利算法）就可以得到最优解。
 
-寻找最优解和之前利用先验知识去把预测框和proposal或者anchor做匹配的方式是差不多的，只不过这里的约束更强，就是一定要得到一个一对一的匹配关系，不像之前是一对多，也就是说现在只有一个框和Ground Truth框是对应的，这样后面才不需要去做nms后处理。
+寻找最优解和之前利用先验知识去把预测框和proposal或者anchor做匹配的方式是差不多的，只不过这里的约束更强，就是一定要得到一个一对一的匹配关系，不像之前是一对多，也就是说现在只有一个框和Ground Truth框是对应的，这样后面才不需要去做nms后处理。**一旦确定100个框中有哪几个框是和Ground Truth是对应的，就可以计算loss了**。
+
+<img width="572" alt="image" src="https://user-images.githubusercontent.com/22740819/182007696-2feffa27-da07-4040-8924-8c2653a58dc8.png">
+
+损失函数如上，也是包含分类损失与回归损失两个部分，DETR中有两个与普通的目标检测不同的地方：
+
+- 为了使分类损失与回归损失在相同的取值空间，去掉了log计算；
+- 回归损失中不再使用L1 loss，因为L1 loss和出框的大小有关系，框越大，计算得到的loss就容易大。因为DETR用了transformer，对大物体比较友好，经常会出大框，就会导致loss大，不利于优化，所以DETR中不仅用了L1 loss，还使用了一个generalized iou loss，该损失与框的大小没有关系。
+
+### 5.2 网络框架
+
+<img width="729" alt="image" src="https://user-images.githubusercontent.com/22740819/182007905-89a53bf4-a404-48ee-9761-4111f279350f.png">
