@@ -74,6 +74,24 @@ GAN需要训练两个网络，生成器（generator）与判别器（discriminat
 
 经过多年时间对GAN的改造，如今GAN也比较好用，所需的数据也不是很多，能够在各个场景下面使用，但是一个致命缺点是训练不稳定，主要原因是需要同时训练生成器与判别器两个网络，另外因为GAN的主要优化目标是让图片尽可能的真实，其多样性不太好，它的多样性主要就是来自于输入的随机噪声，简单来说就是它的创造性不好，不是一个概率模型，它的生成都是隐式的，就是通过一个网络去生成，不知道具体是遵循的什么分布，所以，GAN在数学上不如后续的VAE，扩散模型优美。
 
-### 5.2 Auto-Encoder, Denoising Auto-Encoder, 
+### 5.2 Auto-Encoder, DAE, VAE, VQ-VAE
 
-<img width="600" alt="image" src="https://user-images.githubusercontent.com/22740819/189481439-beaaea34-8ff1-44e7-9f88-161dba12f5cd.png">
+<img width="525" alt="image" src="https://user-images.githubusercontent.com/22740819/189487359-ab20c07d-9aef-4ddf-8193-633a72ce7ca2.png">
+
+**Auto-Encoder**: 给定一个输入x，通过一个编码器得到特征，该特征维度一般比较小，所以经常称之为bottleneck，然后再经过一个解码器，最终得到一个图像，训练时的目标函数是生成的图像尽可能的重建输入x，因为是自己重建自己，所以叫自编码器。
+
+**Denoising Auto-Encoder**: DAE相对于AE是首先对输入x进行一定程度的打乱得到x_c，后续过程与AE相同，最终输出还是重建x，而不是x_c。这个改进证明非常有用，尤其是在视觉领域，会使得训练得到的模型更加鲁棒、不容易过拟合，部分原因是图像像素的冗余性太高了，即使把输入的图片x进行一定程度的污染，模型还是能抓住它的本质将其重建出来。
+
+> 无论是AE、DAE还是MAE，其关键都是为了学习中间的bottleneck特征，然后用于分类、分割等下游任务，它并不是用来做生成的，因为学得的特征z并不是一个概率分布，没办法对其进行采样，并不像GAN中那样是一个随机噪声，它是一个专门用来重建的特征，但是这种encoder-decoder确实是一种很好的结构，为了使用这种结构用于图像生成，有了后续的VAE。
+
+**Variational Auto-Encoder**: 
+
+<img width="559" alt="image" src="https://user-images.githubusercontent.com/22740819/189488271-b9c3cfc0-51dd-4c32-9f7a-2f4fde18f902.png">
+
+VAE与AE非常不一样，虽然整体框架仍然是encoder-decoder结构，但是它中间不再是学习一个固定的bottleneck特征，而是去学习一个分布，VAE中假设该分布是一个高斯分布，就可以用均值和方差来表述。具体地，在encoder得到特征之后，在后面加一些FC层，去预测均值和方差，在得到均值和方差之后，就用上面的公式采样得到一个z出来，这样的话VAE就可以用来做生成了。因为在训练完成VAE模型之后，就可以将前面的encoder丢掉，z可以是从高斯随机噪声中抽样出来的一个样本，然后通过一个decoder去生成一张图片。
+
+> 由于VAE预测的是一个概率分布，从贝叶斯的角度看，前面的部分就是给定x得到z的过程，是一个后验概率，然后学习得到的distribution其实就是一个先验分布；后面部分是给定z预测得到图像x的过程，其实就是maxilize likelyhood，从数学上就优美了很多。而且VAE也有一些很不错的性质，因为它学得的是一个分布，然后从分布里抽样，它生成的图片多样性就比GAN好很多。
+
+**VQ-VAE**:
+
+<img width="654" alt="image" src="https://user-images.githubusercontent.com/22740819/189488422-02bd8037-7425-4dc8-8aa8-2ce3ddfc099a.png">
