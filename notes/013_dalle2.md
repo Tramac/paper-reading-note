@@ -95,3 +95,37 @@ VAE与AE非常不一样，虽然整体框架仍然是encoder-decoder结构，但
 **VQ-VAE**:
 
 <img width="654" alt="image" src="https://user-images.githubusercontent.com/22740819/189488422-02bd8037-7425-4dc8-8aa8-2ce3ddfc099a.png">
+
+VQ-VAE整体上与VAE差不多，其中VQ就是vector quantization，就是把VAE量化。原因是生活中的图像、声音等这种信号都是连续的，大部分任务都是回归任务，但实际上将其表示出来去解决这些问题时其实都将其离散化了，图像就变成了像素，语音也都进行了抽样，大部分工作的比较好的模型也都是分类模型，又都从回归任务变成了分类任务。所以，用之前的VAE方式就不好把模型做大，而且分布z也不好学，所以取而代之的是不去做这个分布的预测，而是用一个codebook代替，这里的codebook可以理解为一个聚类中心，尺寸为KxD，一般K=8192，D=512或768，也就是有8192个聚类中心，如果给定一个图片，经过一个编码器得到特征f，然后将特征图f的向量去跟codebook的向量做对比，然后把距离最近的聚类中心对应的编码索引存放到z矩阵里，一旦做完特征匹配，通过z中的映射得到一个新的特征向量f_q（quantised feature），经过量化后的特征就会非常的可控，因为它全部来自于codebook，不是一个随机的东西，优化起来就会比较容易，后续通过decoder恢复得到图像的过程就和之前一样。
+
+VQ-VAE其实非常有用，它后来不仅用在了DALL·E项目，还用在了视觉领域的自监督学习中，比如BEIT、VL-BEiT等。
+
+**DALL·E**:
+
+### 5.3 Diffusion Model
+
+### 5.4 DALL·E 2
+
+DALL·E 2的训练集也是图像&文本对。假设给定一个图片输入x，z_i与z_t分别表示CLIP生成的图像与文本特征，整个DALL·E 2模型可以分为两个部分：
+
+- prior：根据一个文本y，生成一个图像特征z_i；
+- decoder：输入z_i，通过decoder生成图像x；
+
+#### 5.4.1 decoder
+
+decoder其实是一个GLIDE的变体，首先它用了CLIP模型的guidance，只不过使用的形式在具体的操作上稍微有些变化，技术细节可以看代码。
+
+DALL·E 2中也使用了classifier-free guidance，guidance信号要么来自于CLIP模型，要么来自于文本。实际使用中是10%的时间随机将CLIP特征设成0，训练时50%的时间把文本特征直接丢掉。
+
+为了生成高分辨率的图片，decoder中做了级联式的结构，使用了两个difusion model做上采样，先将分辨率从64x64采样到256x256，再从256x256上采样到1024x1024。另外为了训练时的稳定性，在训练的过程中加入了很多的噪声，而且difusion model的结构主要基于U-Net，只使用了普通的卷积，没有attention操作，所以在推理时可以用在任何尺寸，而不用担心序列长度必须保持一致。
+
+#### 5.4.2 prior
+
+prior模型的作用是给定一个文本，去生成一个图像特征z_i，用于后续decoder的输入。DALL·E 2中针对prior采用了两种方案：
+
+- Autoregressive prior: 该方式与DALL·E和GPT就比较像，输入为文本特征，同时也有CLIP生成的图像特征，然后将图像特征遮住去做自回归预测，这种方式一般训练效率比较低；
+- Diffusion prior: 
+
+无论是Autoregressive prior还是Diffusion prior，都用了classifier-free guidance，因为效果确实好。
+
+对于Diffusion prior，实际是训练了一个transformer decoder，因为它的输入输出都是embedding，所以用U-Net不太合适，直接用transformer更合适。
