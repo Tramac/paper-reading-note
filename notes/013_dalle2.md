@@ -66,6 +66,10 @@ DALL·E 2采用的是两阶段的训练方式，第一阶段为prior，第二阶
 
 文章中比较简略的写了prior与decoder的实现细节，只看这一篇论文可能并不能对整体的框架有很好的了解。下面一部分会从GAN，VAE，VQVAE，DALL·E开始介绍，使得对图像生成有更全面的了解。
 
+![image](https://user-images.githubusercontent.com/22740819/190552576-35f4c85f-d8be-4fbc-889d-6ccdeb4ca58b.png)
+
+图片来自：https://lilianweng.github.io/posts/2021-07-11-diffusion-models/
+
 ### 5.1 GAN
 
 <img width="600" alt="image" src="https://user-images.githubusercontent.com/22740819/189480961-083c5fc6-5e9e-433f-a3e6-144e1acb5b42.png">
