@@ -14,3 +14,4 @@
 - [x] [I3D](./notes/010_i3d.md)
 - [x] [视频理解论文串讲](./notes/011_video_understanding.md)
 - [ ] [DETR](./notes/012_detr.md)
+- [x][DALL·E 2](./notes/013_dalle2.md)
