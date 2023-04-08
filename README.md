@@ -16,3 +16,5 @@
 - [ ] [DETR](./notes/012_detr.md)
 - [x] [DALL·E 2](./notes/013_dalle2.md)
 - [x] [ViLT](./notes/014_vilt.md)
+- [ ] CLIP improve
+- [x] [GPT](./notes/016_gpt.md)
