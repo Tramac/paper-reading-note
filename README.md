@@ -18,3 +18,4 @@
 - [x] [ViLT](./notes/014_vilt.md)
 - [ ] CLIP improve
 - [x] [GPT](./notes/016_gpt.md)
+- [x] [LLaMA](./notes/018_llama.md)
