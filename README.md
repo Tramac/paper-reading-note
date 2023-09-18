@@ -19,5 +19,6 @@
 - [ ] CLIP improve
 - [x] [GPT](./notes/016_gpt.md)
 - [x] [LLaMA](./notes/018_llama.md)
+- [x] [Chinese-LLaMA-Alpaca](./notes/019_chinese_llama.md)
 - [ ] LoRA
 - [ ] Alpaca
