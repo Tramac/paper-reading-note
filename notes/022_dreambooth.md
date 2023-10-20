@@ -4,8 +4,11 @@
 
 ## 标题&作者
 DreamBooth：通过微调 text-to-image 扩散模型以实现 subject-driven 生成。
+
 text-to-image 指的是常规的从文本到图像的扩散模型，根据文本提示生成高质量和多样化的图像，但是这些模型缺乏在指定场景中合成它们的能力。
+
 subject-driven 可以理解为输入的少量图像所确定的主体（subject），比如示意图中的柯基犬。
+
 DreamBooth 将两者结合，text 指定场景，image 给定主体，合成该主体在不同场景下的图像。
 
 作者来自谷歌团队。
