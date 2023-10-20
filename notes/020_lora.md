@@ -20,7 +20,9 @@ LoRA：语言大模型的低秩适配。目前除了 NLP 领域，LoRA 在 stabl
 
 一些工作指出，模型通常是**过参数化**的，它们的有效性可能只依赖更小的内在维度（low intrinsic dimension），**模型主要依赖这个低的内在维度去做任务适配**。所以，假设**模型在适配任务时参数的改变量是低秩的**，由此引出低秩自适应方法lora，**通过低秩分解来模拟参数的改变量**，从而以极小的参数量来实现大模型的间接训练。
 
+<div align="center">
 <img width="287" alt="image" src="https://github.com/Tramac/paper-reading-note/assets/22740819/654a1e76-c89a-48fd-a626-09000d1df96e">
+</div>
 
 如上图，以 GPT-3 175B 模型为例，左侧 W 为预训练模型权重，维度为 dxd，微调过程中只推理不参与训练，右侧 A、B为两个低秩的矩阵，维度分别为 dxr 和 rxd，一般 r 会远远小于 d，微调过程中只更新 A、B两个低秩权重，输出为两个分支的和。可学习参数量由 dxd 降低为 dxr + rxd=dx2r。
 
@@ -36,13 +38,17 @@ LoRA 的优势：
 
 全量微调时，模型先用预训练模型权重Φ0做初始化，然后以下面的目标函数逐步更新权重Φ0 + ∆Φ：
 
+<div align="center">
 <img width="307" alt="image" src="https://github.com/Tramac/paper-reading-note/assets/22740819/8379caac-83cf-4383-a833-61270fa66f83">
+</div>
 
 全量微调主要的缺点是，对于每一个下游任务，学习一组不同的参数 ∆Φ，而这组 ∆Φ 的维度和 Φ0 的维度相同，因此，如果预训练模型很大，比如 GPT-3，那么 Φ0 的大小为 175B，这么多的参数在存储和部署多个实例时将变得很难。
 
 本文提出了一个更高效的参数更新方法，模型的参数更新量 ∆Φ=∆Φ(Θ) 被进一步编码成一组维度更小的参数 Θ，其中 Θ 的大小远远小于 Φ0，因此，计算 ∆Φ 的任务变为只优化 Θ：
 
+<div align="center">
 <img width="368" alt="image" src="https://github.com/Tramac/paper-reading-note/assets/22740819/3ede575d-132d-4f6e-a573-c8cb079417b2">
+</div>
 
 因此，本文提出了一个使用低秩表示来编码 ∆Φ 的方法，既计算高效且存储高效。以 GPT-3 175B 为例，可训练参数量 Θ 只有全量权重 Φ0 的 0.01%。
 
@@ -61,7 +67,9 @@ LoRA 的优势：
 
 对于一个维度为 dxk 的预训练权重 W0，在对其更新时我们将其增量  ∆W 低秩分解为两个矩阵 B 和 A，维度分别为 dxr 和 rxk，并且 r 远远小于 d 和 k，即 W0 + ∆W = W0 + BA。在训练期间，W0是冻住不更新的，只有 A 和 B 包含可训练参数，需要指出的是 W0 和 ∆W 均是和相同的输入做乘法运算，然后将其各自的输出相加得到最终的输出。对于模型的其中一层运算，可用下面公式表示：
 
+<div align="center">
 <img width="297" alt="image" src="https://github.com/Tramac/paper-reading-note/assets/22740819/ef91d0b6-16e7-4e75-b465-e437a89d2da6">
+</div>
 
 其中，A 使用高斯分布初始化，B初始化为0，所以在训练开始时 ∆W = BA = 0，这也比较符合常理。需要注意：在实际计算时，对 ∆Wx 做了尺度变换，乘以 α / r，这个操作**可以减少调整超参数的需要**。
 
@@ -90,13 +98,19 @@ LoRA 的优势：
 
 **文本理解任务对比**
 
+<div align="center">
 <img width="700" alt="image" src="https://github.com/Tramac/paper-reading-note/assets/22740819/9171076b-4344-4b62-ada3-9e2f7b203581">
+</div>
 
 **文本生成任务对比**
 
+<div align="center">
 <img width="700" alt="image" src="https://github.com/Tramac/paper-reading-note/assets/22740819/a8a9ea4c-e862-4b48-8291-cc720cb71525">
+</div>
 
+<div align="center">
 <img width="700" alt="image" src="https://github.com/Tramac/paper-reading-note/assets/22740819/95a3db97-fd55-4c60-b29e-f7dcd7b95777">
+</div>
 
 从上表的结果看，LoRA 在参数量和效果上的 trade-off 做的最好。
 
@@ -106,13 +120,17 @@ LoRA 的优势：
 
 Transformer中的权重矩阵比较多，比如 self-attention 部分：Wq、Wk、Wv、Wo；MLP部分：W1、W2。论文只研究了LoRA应用于transformer Attention层上的效果，发现**同时对Wq和Wv应用Lora效果较好**。
 
+<div align="center">
 <img width="700" alt="image" src="https://github.com/Tramac/paper-reading-note/assets/22740819/ded26ef3-42e2-4adf-ace1-9e587baba01a">
+</div>
 
 #### 8.2 r 参数的影响
 
 对于一般的任务，rank=1,2,4,8 即可，而对于一些领域差距比较大的任务可能需要更大的rank。
 
+<div align="center">
 <img width="700" alt="image" src="https://github.com/Tramac/paper-reading-note/assets/22740819/795e808b-1e8a-4ecb-99aa-15088fc8b0d6">
+</div>
 
 ## 9 结论
 
