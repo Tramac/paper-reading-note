@@ -80,21 +80,27 @@ ControlNet 是一个可以给 text-to-image 模型添加控制的网络结构。
 ControlNet 将附加条件注入到神经网络 block 中。在这里，我们用「network block」表示神经网络中通常被组在一起的层，比如 resnet block、conv-bn-relu block、multi-head attention block、transformer block 等。
 
 假设用 $\mathcal{F}(·;\Theta )$ 表示一个 block，其参数为 $\Theta$，那么，将一个输入特征图 $x$ 转换为另一个特征图 $y$ 可以表示为：
+
 $$
 y = \mathcal{F}(x;\Theta)
 $$
+
 在本文中，$x$ 和 $y$ 通常是 2D 特征图，如上图中的（a），对一个「network block」添加 ControlNet，首先将该 block 的参数 $\Theta$ 冻住，同时将该 block 复制一份作为「trainable copy」，其参数为 $\Theta_c$，如上图中的（b），「trainable copy」以一个外部条件向量 $c$ 作为输入。
 
 当该结构应用于大模型比如 Stable Diffusion 中时，那些冻住的参数保留了用数十亿张图像训练得到的模型能力，而「trainable copy」模块重新利用该模型去建立一个深的、鲁棒的、强大的 backbone 来处理各种各样的输入条件。
 
 「trainable copy」通过「zero convolution」与「locked model」连接，我们用 $\mathcal{Z}(·;·)$ 来表示「zero convolution」，具体来说，「zero convolution」 是一个 1 × 1 的卷积层，其 weight 和 bias 都被初始化为 0。对于一个 ControlNet 结构，通常有两个「zero convolution」，我们分别用 $\Theta_{z1}$ 和 $\Theta_{z2}$ 表示它们的参数，那么一个完整的 ControlNet 结构可以用以下公式表示：
+
 $$
 y_c = \mathcal{F}(x;\Theta) + \mathcal{Z}(\mathcal{F}(x + \mathcal{Z}(c;\Theta_{z1});\Theta_{c});\Theta_{z1})
 $$
+
 其中，$y_c$ 为 ControlNet block 的输出。在训练的第一步，因为「zero convolution」的 weight 和 bias 均是 0，在上面的公式中，第二项为 0 ，所以有：
+
 $$
 y_c = y
 $$
+
 这样一来，当训练开始时，「trainable copy」中的有害噪声将不会对网络产生影响。而且，因为 $\mathcal{Z}(c;\Theta_{z1}) = 0$ 并且「trainable copy」也接受输入 $x$，所以它保留了预训练模型的能力并可以进一步学习得到更强的 backbone。「zero convolution」在初始的训练步骤中，通过消除随机噪声作为梯度（？）来保护 backbone 不被训崩，其梯度计算方式在补充材料中有说明。
 
 #### 3.2 ControlNet for Text-to-Image Diffusion
@@ -114,9 +120,11 @@ Image diffusion model 实际是学习一个逐渐去燥的过程，这个过程�
 > 我们把 512 x 512 大小的原始图像称为「pixel-space images」，使用 VQ-GAN 中的预处理方法将其处理为 64 x 64 的「latent images」。
 
 对于 ControlNet 的输入，我们也是先将「conditioning image」（edge、pose、depth 等）从 512 x 512 转为 64 x 64 大小的「feature space vector」$c_i$，具体操作是，使用一个包含 4 层卷积层的小网络 $\varepsilon (·)$ 将 「image-space」condition $c_i$ 转为 「feature space」conditioning vector $c_f$：
+
 $$
 c_f = \varepsilon(c_i)
 $$
+
 最终将 $c_f$ 送给 ControlNet 作为输入。
 
 #### 3.3 训练
@@ -124,9 +132,11 @@ $$
 给定一张输入图像 $z_0$，diffusion 过程是逐渐对该图像添加噪声，最终生成一张噪声图 $z_t$，其中 $t$ 为添加噪声的次数。
 
 给定一组「conditions」，包含添加次数 $t$，text prompts $c_t$ 以及 condition $c_f$，diffusion 算法的目标是学习一个网络 $\epsilon_\theta $ 去预测添加在噪声图像 $z_t$ 上的噪声，损失函数为：
+
 $$
 \mathcal{L} = \mathbb{E}_{z_0,t,c_t,c_f,\epsilon \sim \mathcal{N}(0,1)}[||\epsilon - \epsilon_\theta (z_t,t,c_t,c_f)||_{2}^{2}] 
 $$
+
 在训练过程中，我们随机替换 50% 的 text prompts $c_t$ 为空字符串，该操作增强了 ControlNet 识别输入的 condition 的语义能力，从而不用显式的给一个 prompt 专门提示 condition 的类别。
 
 因为「zero convolutions」并没有将噪声引入到网络中，所以模型总是可以生成高质量的图像。经过观察，模型并不是逐渐学习到条件控制的能力，而是突然地拥有遵循「conditioning image」的能力。
@@ -140,9 +150,11 @@ $$
 控制输入条件的权重。
 
 Stable Diffusion 生成高质量图像依赖一种叫「Classifier-Free Guidance」的技术，CFG 的公式表示为：
+
 $$
 \epsilon_{prd} = \epsilon_{uc} + \beta_{cfg}(\epsilon_c - \epsilon_{uc})
 $$
+
 其中，$\epsilon_{prd}$、$\epsilon_{uc}$、$\epsilon_c$ 和 $\beta_{cfg}$ 分别为模型的最终输出、没有添加条件控制时的输出、条件控制以及权重参数。（该公式主要是想说明条件控制的强度对模型最终输出效果的影响）
 
 <div align="center">
