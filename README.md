@@ -25,3 +25,4 @@
 - [x] [LLaMA2](./notes/021_llama2.md)
 - [x] [DreamBooth](./notes/022_dreambooth.md)
 - [x] [ControlNet](./notes/023_controlnet.md)
+- [x] [EasyPhoto](./notes/024_easyphoto.md)
