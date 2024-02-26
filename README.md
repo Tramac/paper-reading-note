@@ -26,3 +26,4 @@
 - [x] [DreamBooth](./notes/022_dreambooth.md)
 - [x] [ControlNet](./notes/023_controlnet.md)
 - [x] [EasyPhoto](./notes/024_easyphoto.md)
+- [ ] [StableDiffusion](./notes/025_stable_diffusion.md)
