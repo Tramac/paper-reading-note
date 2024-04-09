@@ -27,3 +27,4 @@
 - [x] [ControlNet](./notes/023_controlnet.md)
 - [x] [EasyPhoto](./notes/024_easyphoto.md)
 - [x] [StableDiffusion](./notes/025_latent_diffusion_model.md)
+- [ ] IPAdapter
