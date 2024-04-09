@@ -230,3 +230,14 @@ text prompt 设计：
 <div align="center">
 <img width="450" alt="image" src="https://github.com/Tramac/paper-reading-note/assets/22740819/46cad5f2-0108-4454-8974-54fdf2aaaf78">
 </div>
+
+## Bonus
+
+最近在训 controlnet 时，遇到了 "sudden convergence phenomenon" 现象，这个在论文里也有提到，这里记录一下。
+
+sudden convergence phenomenon 现象是指模型在训练过程中，在某个时间点“突然收敛”的现象，如下图：
+<div align="center">
+<img width="450" alt="image" src="https://github.com/Tramac/paper-reading-note/assets/22740819/14470e55-359b-44e5-8b6e-0276ed76f907">
+</div>
+
+至于原因，在[知乎](https://www.zhihu.com/question/627033160/answer/3268500462)上也有一些讨论，但都是一些猜测。
