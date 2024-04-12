@@ -28,3 +28,5 @@
 - [x] [EasyPhoto](./notes/024_easyphoto.md)
 - [x] [StableDiffusion](./notes/025_latent_diffusion_model.md)
 - [x] [IPAdapter](./notes/026_ipadapter.md)
+- [ ] Consistency Models
+- [ ] Latent Consistency Models
