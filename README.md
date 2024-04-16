@@ -31,3 +31,4 @@
 - [x] [SDXL](./notes/027_sdxl.md)
 - [ ] Consistency Models
 - [ ] Latent Consistency Models
+- [ ] SDXL Turbo
