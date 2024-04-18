@@ -165,3 +165,8 @@ Consistency Models 的第一种训练方式是从预训练好的 diffusion model
 <div align="center">
 <img height="600" alt="image" src="https://github.com/Tramac/paper-reading-note/assets/22740819/e10a334a-c777-46dd-b669-fc4345423855">
 </div>
+
+## 参考
+
+- https://wrong.wang/blog/20231111-consistency-is-all-you-need
+- https://yang-song.net/assets/pdf/ICML2023/consistency.pdf
