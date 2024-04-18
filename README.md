@@ -26,9 +26,9 @@
 - [x] [DreamBooth](./notes/022_dreambooth.md)
 - [x] [ControlNet](./notes/023_controlnet.md)
 - [x] [EasyPhoto](./notes/024_easyphoto.md)
-- [x] [StableDiffusion](./notes/025_latent_diffusion_model.md)
+- [x] [LatentStableDiffusion](./notes/025_latent_diffusion_model.md)
 - [x] [IPAdapter](./notes/026_ipadapter.md)
 - [x] [SDXL](./notes/027_sdxl.md)
-- [ ] Consistency Models
+- [x] [Consistency Models](./notes/028_consistency_models.md)
 - [ ] Latent Consistency Models
 - [ ] SDXL Turbo
