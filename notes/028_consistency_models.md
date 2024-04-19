@@ -1,5 +1,7 @@
 # Consistency Models
 
+[Paper](https://arxiv.org/pdf/2303.01469.pdf) | [code](https://github.com/openai/consistency_models)
+
 ## 题目&作者
 
 Consistency models：一致性模型
