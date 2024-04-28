@@ -27,7 +27,7 @@
 - [x] [ControlNet](./notes/023_controlnet.md)
 - [x] [EasyPhoto](./notes/024_easyphoto.md)
 - [x] [LatentStableDiffusion](./notes/025_latent_diffusion_model.md)
-- [x] [Stable Diffusion 2.x] (./notes/030_stable_diffusion_2.x.md) 
+- [x] [Stable Diffusion 2.x](./notes/030_stable_diffusion_2.x.md) 
 - [x] [IPAdapter](./notes/026_ipadapter.md)
 - [x] [SDXL](./notes/027_sdxl.md)
 - [x] [Consistency Models](./notes/028_consistency_models.md)
