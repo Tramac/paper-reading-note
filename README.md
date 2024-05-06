@@ -30,6 +30,6 @@
 - [x] [Stable Diffusion 2.x](./notes/030_stable_diffusion_2.x.md) 
 - [x] [IPAdapter](./notes/026_ipadapter.md)
 - [x] [SDXL](./notes/027_sdxl.md)
+- [x] [SDXL Turbo](./notes/031_sdxl_turbo.md)
 - [x] [Consistency Models](./notes/028_consistency_models.md)
 - [ ] Latent Consistency Models
-- [ ] SDXL Turbo
