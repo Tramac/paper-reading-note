@@ -33,3 +33,4 @@
 - [x] [SDXL Turbo](./notes/031_sdxl_turbo.md)
 - [x] [Consistency Models](./notes/028_consistency_models.md)
 - [ ] Latent Consistency Models
+- [ ] DiT
