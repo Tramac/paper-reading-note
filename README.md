@@ -34,3 +34,12 @@
 - [x] [Consistency Models](./notes/028_consistency_models.md)
 - [ ] Latent Consistency Models
 - [ ] DiT
+
+## VLM
+
+- [ ] LLaVA
+- [ ] Mini-GPT4
+- [ ] Qwen-VL
+- [ ] DeepSeek-VL
+- [ ] Fuyu-8B
+- [ ] InternVL
