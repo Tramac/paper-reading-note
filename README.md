@@ -2,7 +2,6 @@
 
 [李沐论文精读](https://github.com/mli/paper-reading)笔记
 
-- [x] [Transformer](./notes/001_transformer.md)
 - [x] [BERT](./notes/002_bert.md)
 - [x] [ViT](./notes/003_vit.md)
 - [x] [MAE](./notes/004_mae.md)
@@ -17,12 +16,9 @@
 - [x] [DALL·E 2](./notes/013_dalle2.md)
 - [x] [ViLT](./notes/014_vilt.md)
 - [ ] CLIP improve
-- [x] [GPT](./notes/016_gpt.md)
-- [x] [LLaMA](./notes/018_llama.md)
-- [x] [Chinese-LLaMA-Alpaca](./notes/019_chinese_llama.md)
 - [x] [LoRA](./notes/020_lora.md)
-- [ ] Alpaca
-- [x] [LLaMA2](./notes/021_llama2.md)
+
+## AIGC
 - [x] [DreamBooth](./notes/022_dreambooth.md)
 - [x] [ControlNet](./notes/023_controlnet.md)
 - [x] [EasyPhoto](./notes/024_easyphoto.md)
@@ -34,6 +30,13 @@
 - [x] [Consistency Models](./notes/028_consistency_models.md)
 - [ ] Latent Consistency Models
 - [ ] DiT
+
+## LLM
+- [x] [Transformer](./notes/001_transformer.md)
+- [x] [GPT](./notes/016_gpt.md)
+- [x] [LLaMA](./notes/018_llama.md)
+- [x] [Chinese-LLaMA-Alpaca](./notes/019_chinese_llama.md)
+- [x] [LLaMA2](./notes/021_llama2.md)
 
 ## VLM
 
