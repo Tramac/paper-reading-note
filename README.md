@@ -40,7 +40,7 @@
 
 ## VLM
 
-- [x] LLaVA(./notes/032_llava.md)
+- [x] [LLaVA](./notes/032_llava.md)
 - [ ] Mini-GPT4
 - [ ] Qwen-VL
 - [ ] DeepSeek-VL
