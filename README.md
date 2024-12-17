@@ -41,7 +41,7 @@
 ## VLM
 
 - [x] [LLaVA](./notes/032_llava.md)
-- [ ] Mini-GPT4
+- [x] [Mini-GPT4](./notes/033_minigpt4.md)
 - [ ] Qwen-VL
 - [ ] DeepSeek-VL
 - [ ] Fuyu-8B
