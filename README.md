@@ -43,6 +43,6 @@
 - [x] [LLaVA](./notes/032_llava.md)
 - [x] [Mini-GPT4](./notes/033_minigpt4.md)
 - [x] [Qwen-VL](./notes/034_qwenvl.md)
+- [x] [Fuyu-8B](./notes/035_fuyu8b.md)
 - [ ] DeepSeek-VL
-- [ ] Fuyu-8B
 - [ ] InternVL
