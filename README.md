@@ -45,4 +45,4 @@
 - [x] [Qwen-VL](./notes/034_qwenvl.md)
 - [x] [Fuyu-8B](./notes/035_fuyu8b.md)
 - [x] [DeepSeek-VL](./notes/036_deepseekvl.md)
-- [ ] InternVL
+- [x] [InternVL](./notes/037_internvl.md)
