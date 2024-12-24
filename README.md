@@ -39,10 +39,15 @@
 - [x] [LLaMA2](./notes/021_llama2.md)
 
 ## VLM
-
+- [ ] BLIP-2
 - [x] [LLaVA](./notes/032_llava.md)
 - [x] [Mini-GPT4](./notes/033_minigpt4.md)
 - [x] [Qwen-VL](./notes/034_qwenvl.md)
 - [x] [Fuyu-8B](./notes/035_fuyu8b.md)
 - [x] [DeepSeek-VL](./notes/036_deepseekvl.md)
 - [x] [InternVL](./notes/037_internvl.md)
+- [ ] InternVL-1.5
+- [ ] InternVL-2
+- [ ] Qwen2-VL
+- [ ] DeepSeek-VL2
+- [ ] InternVL-2.5
