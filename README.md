@@ -39,7 +39,7 @@
 - [x] [LLaMA2](./notes/021_llama2.md)
 
 ## VLM
-- [ ] BLIP-2
+- [x] [BLIP-2](./notes/038_blip2.md)
 - [x] [LLaVA](./notes/032_llava.md)
 - [x] [Mini-GPT4](./notes/033_minigpt4.md)
 - [x] [Qwen-VL](./notes/034_qwenvl.md)
