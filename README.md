@@ -46,7 +46,7 @@
 - [x] [Fuyu-8B](./notes/035_fuyu8b.md)
 - [x] [DeepSeek-VL](./notes/036_deepseekvl.md)
 - [x] [InternVL](./notes/037_internvl.md)
-- [ ] InternVL-1.5
+- [x] [InternVL-1.5](/notes/039_internvl1.5.md)
 - [ ] InternVL-2
 - [ ] Qwen2-VL
 - [ ] DeepSeek-VL2
