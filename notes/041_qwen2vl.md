@@ -1,12 +1,55 @@
-Qwen2-VL
+# Qwen2-VL
 
 [paper](https://arxiv.org/pdf/2409.12191) | [code](https://github.com/QwenLM/Qwen2-VL) | [blog](https://qwenlm.github.io/zh/blog/qwen2-vl/)
 
-TL;DR
+## TL;DR
 
+- Naive Dynamic Resolution，动态分辨率输入
+- Multimodal Rotary Position Embedding (M-RoPE)，促进跨文本、图像和视频的位置信息的有效融合
 - 详细的对数据格式，基础设施的描述，很赞
 
+## Abstract
 
+Qwen2-VL 引入了动态分辨率机制，使模型能够动态地将不同分辨率的图像处理成不同数量的 visual tokens。使模型生成更高效和准确的视觉表示，模型同时还集成了 M-RoPE，促进跨文本、图像和视频的位置信息的有效融合。Qwen2-VL 采用统一的范式来处理图像和视频，增强了模型的视觉感知能力。为了探索 LVLMs 的潜力，Qwen2-VL 研究了 LVLMs 的 scaling laws。通过对模型参数量（2B、8B、 72B） 以及训练数据量的扩增，Qwen2-VL 系列实现了极具竞争力的性能。在各种多模态基准测试中取得了与 GPT-4o 和 Claude3.5-Sonnet 等领先模型相当的结果，优于其他通用模型。
+
+## 1 Introduction
+
+LVLMs 的一般范式是 visual encoder→cross-modal connector→LLM，基于 high-quality 数据集和 next-token prediction 的目标，完成模型的训练。很多方法都是在这个范式的基础之上做一些改进：更大的模型结构、更高的输入分辨率、MoE、模型集成、更复杂的 adaptor。
+
+然而，当前的 LVLMs 通常局限于固定分辨率的输入。对于不同分辨率的图像，会先经过上采样或下采样至固定尺寸后再送给模型。虽然这种一刀切的策略能够处理不同分辨率的图像，但是限制了模型在不同尺度上捕获信息的能力，特别是会导致高分辨率图像中细节信息的丢失。
+
+此外，大多数 LVLM 依赖于 frozen CLIP-style vision encoder，这种预训练模型的视觉表征能力通常比较有限，尤其是对复杂的推理任务或者需要理解图像中的复杂细节时。有些工作试图通过在 LVLM 训练过程中微调 vision encoder 来解决这些限制，为了进一步增强模型对不同分辨率的适应性，本文在 LVLM 训练过程中引入了动态分辨率训练。另外，还在 ViT 中使用 2D RoPE，使模型更好地捕捉不同空间尺度的信息。
+
+对于视频 video，本质是一些图像帧序列，许多方法将其视为一个单独的模态。和 text 这种 1D 信息不同，使用 1D 位置编码对 video 这种具有 3D 空间特征的信息进行编码是不充分的，为了弥补这一差距，本文提出 Multimodal Rotary Position Embedding (M-RoPE)，使用单独的组件分别表示时序和空间信息，这使得模型能够自然地理解动态内容，例如视频或流数据，提高其理解和与世界交互的能力。
+
+Qwen2-VL的关键进展包括：
+
+- **读懂不同分辨率和不同长宽比的图片**：Qwen2-VL 在 MathVista、DocVQA、RealWorldQA、MTVQA 等视觉理解基准测试中取得了全球领先的表现。
+- **理解20分钟以上的长视频**：Qwen2-VL 可理解长视频，并将其用于基于视频的问答、对话和内容创作等应用中。
+- **能够操作手机和机器人的视觉智能体**：借助复杂推理和决策的能力，Qwen2-VL 可集成到手机、机器人等设备，根据视觉环境和文字指令进行自动操作。
+- **多语言支持**：为了服务全球用户，除英语和中文外，Qwen2-VL 现在还支持理解图像中的多语言文本，包括大多数欧洲语言、日语、韩语、阿拉伯语、越南语等。
+
+## 2 Approach
+
+Qwen2-VL 系列由 3 个大小的模型组成，分别是 Qwen2-VL-2B、Qwen2-VL-7B 和 Qwen2-VL72B。
+
+### 2.1 Model Architecture
+
+<center>
+    <img src="https://github.com/user-attachments/assets/fff6ab8c-fb5f-4186-b500-e98e7f13506c">
+</center>
+
+Qwen2-VL 保留了 Qwen-VL 的框架。为了适应于各种规模的 adaptor，Qwen2-VL 实现了一个参数量约为 675M 的 ViT，可以同时处理图像和视频输入。为了进一步增强模型在视频中有效感知和理解视觉信息的能力，Qwen2-VL 引入了几个关键升级：
+
+- **Naive Dynamic Resolution**
+
+  Qwen2-VL 现在可以处理任何分辨率的图像，将它们动态转换为可变数量的 visual tokens。为了支持此功能，我们将 ViT 中原始的绝对位置编码替换为 2D-RoPE，用于捕捉图像的二维位置信息。在推理阶段，不同分辨率的图像被打包成单个序列，为了减少每个图像的 visual tokens 数量，在ViT之后用了一个简单的 MLP 层，将相邻的 2 × 2 tokens 压缩为单个 token。使用特殊 token $<|vision_start|>$ 和 $<|vision_end|>$ 表示 visual tokens 的开始和结束。因此，分辨率为224 × 224的图像，使用 patch_size=14的 ViT 编码，在进入LLM之前将被压缩为 66 个 tokens。
+
+  > 224/14=16，16/2=8（MLP压缩），8x8+2=66
+
+- **Multimodal Rotary Position Embedding (M-RoPE)**
+
+  1D-RoPE 只能用于编码 1D 位置信息，M-RoPE 有效的对多模态输入的位置信息进行了建模。通过对原始 RoPE 解构为三个组件来实现的：(temporal, height, width)。对于 text 输入，这些组件使用相同的位置 ID，使得 M-RoPE 在功能上等同于 1D-RoPE。对于图像，每个 visual token 的时间ID保持不变，而不同的 id 根据 token 在图像中的位置分配给 height 和 weight。
 
 - **Unified Image and Video Understanding**
 
