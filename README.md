@@ -48,6 +48,6 @@
 - [x] [InternVL](./notes/037_internvl.md)
 - [x] [InternVL-1.5](/notes/039_internvl1.5.md)
 - [x] [InternVL-2](./notes/040_internvl2.md)
-- [ ] Qwen2-VL
+- [x] [Qwen2-VL](./notes/041_qwen2vl.md)
 - [x] [DeepSeek-VL2](./notes/042_deepseekvl2.md)
 - [ ] InternVL-2.5
