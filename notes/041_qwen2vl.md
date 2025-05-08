@@ -4,8 +4,9 @@
 
 ## TL;DR
 
-- Naive Dynamic Resolution，动态分辨率输入
-- Multimodal Rotary Position Embedding (M-RoPE)，促进跨文本、图像和视频的位置信息的有效融合
+- 动态分辨率处理：引入naive dynamic resolution技术，能够灵活处理不同分辨率的输入
+- 多模态位置编码：创新性提出多模态旋转位置编码（M-RoPE），促进跨文本、图像和视频的位置信息的有效融合
+- 图像和视频的统一理解框架：图像被处理为两个相同帧，保持与视频处理的一致性，使用3D tubes替代2D patches处理方式
 - 详细的对数据格式，基础设施的描述，很赞
 
 ## Abstract
