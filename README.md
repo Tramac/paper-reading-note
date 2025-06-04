@@ -52,4 +52,4 @@
 - [x] [DeepSeek-VL2](./notes/042_deepseekvl2.md)
 - [ ] InternVL-2.5
 
-## Universl Multimodel Retrieval
+## Universal Multimodel Retrieval
