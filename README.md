@@ -51,3 +51,5 @@
 - [x] [Qwen2-VL](./notes/041_qwen2vl.md)
 - [x] [DeepSeek-VL2](./notes/042_deepseekvl2.md)
 - [ ] InternVL-2.5
+
+## Universl Multimodel Retrieval
