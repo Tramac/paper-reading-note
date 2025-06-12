@@ -53,5 +53,5 @@
 - [ ] InternVL-2.5
 
 ## Universal Multimodel Retrieval
-
+- [x] [VLM2Vec](./notes/044_vlm2vec.md)
 - [x] [MegaPairs](./notes/043_megapairs.md)
