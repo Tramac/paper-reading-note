@@ -55,3 +55,4 @@
 ## Universal Multimodel Retrieval
 - [x] [VLM2Vec](./notes/044_vlm2vec.md)
 - [x] [MegaPairs](./notes/043_megapairs.md)
+- [x] [GME](./notes/045_gme.md)
